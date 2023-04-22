@@ -1,6 +1,6 @@
 <template>
   <div class="p-12 flex flex-col gap-4">
-    <section class="flex gap-4 overflow-auto">
+    <section class="flex gap-4 flex-wrap">
       <button
         class="dark:text-white bg-transparent border-green-500 border-2 rounded px-2 py-1 text-2xl font-bold hover:bg-green-500 flex gap-4 items-center"
         @click="store.init"
