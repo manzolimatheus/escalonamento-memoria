@@ -41,8 +41,7 @@ import { useToastStore } from '@/store/toastStore'
 const toastStore = useToastStore()
 
 function submitForm({nome, tempo}) {
-  const tempoNumber = Number(tempo)
-  store.addProcess({nome, tempo: tempoNumber})
+  store.addProcess({nome, tempo: Number(tempo)})
   toastStore.setToast('Processo adicionado com sucesso!')
 }
 </script>

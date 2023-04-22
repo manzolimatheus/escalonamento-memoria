@@ -1,38 +1,42 @@
 <template>
   <div>
-    <section id="charts" class="grid grid-cols-2 mt-6 overflow-auto">
+    <section id="charts" class="grid grid-cols-1 md:grid-cols-2 my-6 overflow-auto">
       <Bar
         id="my-chart-id"
         :options="charts.chartOptions"
         :data="charts.awaitingChart"
         :height="300"
-        class="overflow-auto w-full"
+        class="w-full"
       />
       <Bar
         id="my-chart-id"
         :options="charts.chartOptions"
         :data="charts.turnaroundChart"
         :height="300"
-        class="overflow-auto w-full"
+        class="w-full"
       />
     </section>
     <section class="overflow-auto rounded shadow-sm border-slate-400 border-2">
       <table class="shadow-sm w-max md:w-full">
         <thead class="bg-slate-300 dark:bg-slate-950">
           <tr class="text-start">
+            <th class="p-2">Ordem</th>
             <th class="p-2">Nome</th>
             <th class="p-2">Status</th>
-            <th class="p-2">Tempo de execução</th>
+            <th class="p-2">Tempo restante</th>
             <th class="p-2">Tempo de espera</th>
             <th class="p-2">Tempo de turnaround</th>
           </tr>
         </thead>
         <tbody class="bg-white dark:bg-slate-800 p-4">
           <tr
-            v-for="process in store.getProcesses()"
-            :key="process.nome"
-            class="border-b-2 border-slate-500 text-center"
+            v-for="(process, index) in store.getProcesses()"
+            :key="process.id"
+            :class="`border-b-2 border-slate-500 text-center ${
+              store.currentIndex - 1 === index ? 'bg-blue-500' : ''
+            }`"
           >
+            <td class="p-2">{{ process.id }}</td>
             <td class="p-2">{{ process.nome }}</td>
             <td class="p-2">
               <div v-show="process.status === 'Pronto'">
@@ -60,12 +64,14 @@
             <td class="p-2">{{ process.tempoTurnaround || 0 }}</td>
           </tr>
           <tr class="bg-slate-300 dark:bg-slate-950 p-2 text-center font-bold">
-            <td colspan="3" class="p-2">Tempo de espera</td>
-            <td colspan="3" class="p-2">Tempo de processador</td>
+            <td colspan="2" class="p-2">Tempo Médio de espera</td>
+            <td colspan="2" class="p-2">Tempo Médio de retorno</td>
+            <td colspan="2" class="p-2">Tempo de processador</td>
           </tr>
           <tr>
-            <td colspan="3" class="text-center p-2">{{ store.tempoMediaEspera }}</td>
-            <td colspan="3" class="text-center p-2">{{ store.tempoTotalProcessador }}</td>
+            <td colspan="2" class="text-center p-2">{{ store.tempoMediaEspera }}</td>
+            <td colspan="2" class="text-center p-2">{{ store.tempoMedioRetorno }}</td>
+            <td colspan="2" class="text-center p-2">{{ store.tempoTotalProcessador }}</td>
           </tr>
         </tbody>
       </table>
@@ -74,7 +80,7 @@
 </template>
 
 <script setup>
-import { watch, ref } from 'vue'
+import { computed } from 'vue'
 import { useProcessStore } from '@/store/processStore'
 import {
   Chart as ChartJS,
@@ -91,39 +97,12 @@ import { Bar } from 'vue-chartjs'
 const store = useProcessStore()
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
-const charts = ref({
-  awaitingChart: {
-    labels: store.processos.map((processo) => processo.nome),
-    scale: 10,
-    datasets: [
-      {
-        label: 'Tempo de Espera',
-        backgroundColor: '#f87979',
-        data: store.processos.map((processo) => processo.tempoEspera)
-      }
-    ]
-  },
-  turnaroundChart: {
-    labels: store.processos.map((processo) => processo.nome),
-    datasets: [
-      {
-        label: 'Tempo de Turnaround',
-        backgroundColor: '#457be5',
-        data: store.processos.map((processo) => processo.tempoTurnaround)
-      }
-    ]
-  },
-  chartOptions: {
-    responsive: false
-  }
-})
 
-watch(store.processos, () => {
-  console.log('processos mudaram')
-  console.log(store.processos.map((processo) => processo.nome))
-  charts.value = {
+const charts = computed(() => {
+  return {
     awaitingChart: {
       labels: store.processos.map((processo) => processo.nome),
+      scale: 10,
       datasets: [
         {
           label: 'Tempo de Espera',

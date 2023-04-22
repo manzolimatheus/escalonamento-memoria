@@ -1,6 +1,6 @@
 <template>
   <div class="p-12 flex flex-col gap-4">
-    <section class="flex gap-4">
+    <section class="flex gap-4 overflow-auto">
       <button
         class="dark:text-white bg-transparent border-green-500 border-2 rounded px-2 py-1 text-2xl font-bold hover:bg-green-500 flex gap-4 items-center"
         @click="store.init"
@@ -10,7 +10,7 @@
       </button>
       <button
         class="dark:text-white bg-transparent border-red-500 border-2 rounded px-2 py-1 text-2xl font-bold hover:bg-red-500 flex gap-4 items-center"
-        @click="clearData"
+        @click="store.clear"
       >
         <ion-icon name="trash-bin-outline"></ion-icon>
         <span>Resetar</span>
@@ -62,8 +62,4 @@ import ProcessesTable from '@/components/ProcessesTable.vue'
 import { useProcessStore } from '@/store/processStore'
 
 const store = useProcessStore()
-
-function clearData() {
-  store.clear()
-}
 </script>

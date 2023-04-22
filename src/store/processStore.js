@@ -4,41 +4,48 @@ export const useProcessStore = defineStore('process', () => {
   return {
     processos: [
       {
-        nome: 'P1',
+        id: 1,
+        nome: 'A',
         tempo: 6,
-        tempoTurnaround: 20,
-        tempoEspera: 12,
+        tempoTurnaround: 0,
+        tempoEspera: 0,
         status: 'Pronto'
       },
       {
-        nome: 'P2',
+        id: 2,
+        nome: 'B',
         tempo: 8,
-        tempoTurnaround: 5,
-        tempoEspera: 6,
+        tempoTurnaround: 0,
+        tempoEspera: 0,
         status: 'Pronto'
       },
       {
-        nome: 'P3',
-        tempo: 7,
-        tempoTurnaround: 3,
-        tempoEspera: 10,
+        id: 3,
+        nome: 'C',
+        tempo: 4,
+        tempoTurnaround: 0,
+        tempoEspera: 0,
         status: 'Pronto'
       },
       {
-        nome: 'Abrir discord',
+        id: 4,
+        nome: 'D',
         tempo: 2,
-        tempoTurnaround: 3,
-        tempoEspera: 1,
+        tempoTurnaround: 0,
+        tempoEspera: 0,
         status: 'Pronto'
       }
     ],
     quantum: 2,
     tempoMediaEspera: 0,
+    tempoMedioRetorno: 0,
     tempoTotalProcessador: 0,
+    currentIndex: 1,
     setQuantum(quantum) {
       this.quantum = quantum
     },
     addProcess(process) {
+      process.id = this.processos.length + 1
       process.status = 'Pronto'
       process.tempoTurnaround = 0
       process.tempoEspera = 0
@@ -57,70 +64,65 @@ export const useProcessStore = defineStore('process', () => {
       this.processos = []
       this.tempoMediaEspera = 0
       this.tempoTotalProcessador = 0
+      this.tempoMedioRetorno = 0
       this.quantum = 0
+      this.currentIndex = 1
     },
-    sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms))
-    },
-    async init() {
-      let contador = this.processos.length
-      let ordem_execucao = []
-      let tempos_processsos = []
-      let tempo_espera_total = 0
-      let tempo_turnaround_total = 0
+    init() {
+      // Crie uma cópia de backup do array this.processos
+      const backup = JSON.parse(JSON.stringify(this.processos))
 
-      for (let i = 0; i < this.processos.length; i++) {
-        tempos_processsos.push(this.processos[i].tempo)
-      }
+      let filtrado = this.processos.filter((processo) => processo.status !== 'Concluído')
 
-      while (contador > 0) {
-        for (let i = 0; i < this.processos.length; i++) {
-          await this.sleep(1000)
-          if (
-            this.processos[i].tempo > 0 &&
-            (this.processos[i].status == 'Pronto' || this.processos[i].status == 'Executando')
-          ) {
-            this.processos[i].status = 'Executando'
-            ordem_execucao.push(this.processos[i].nome)
-            let tempo_espera = tempo_espera_total
-            let tempo_turnaround = tempo_turnaround_total
-            for (let j = 0; j < ordem_execucao.length - 1; j++) {
-              if (ordem_execucao[j] === this.processos[i].nome) {
-                tempo_espera += tempos_processsos[i] * (j + 1)
-                tempo_turnaround += tempos_processsos[i] * (j + 1)
-                console.log('aaa ' + tempo_turnaround)
-              } else {
-                tempo_espera += tempos_processsos[j]
-                tempo_turnaround += tempos_processsos[j + 1] + tempos_processsos[i]
-              }
-            }
-            this.processos[i].tempoTurnaround =
-              this.processos[i - 1] == undefined
-                ? 0 + tempos_processsos[i]
-                : this.processos[i - 1].tempoTurnaround + tempos_processsos[i]
-            this.processos[i].tempoEspera =
-              this.processos[i - 1] == undefined
-                ? 0
-                : this.processos[i - 1].tempoEspera + tempos_processsos[i - 1]
-            console.log(tempos_processsos[i])
-            if (this.processos[i].tempo > this.quantum) {
-              this.processos[i].tempo -= this.quantum
-              tempo_espera_total += this.quantum
-            } else {
-              this.processos[i].status = 'Concluído'
-              this.processos[i].tempo -= this.quantum
-              if (this.processos[i].tempo < 0) {
-                this.processos[i].tempo = 0
-              }
-              tempo_espera_total += this.processos[i].tempoEspera
-              tempo_turnaround_total += this.processos[i].tempoTurnaround
-              contador--
-            }
-          }
-          console.log('-------------------------------------------------------------')
+      const interval = setInterval(() => {
+        if (filtrado.length === 0) {
+          clearInterval(interval)
+          console.log('Todos os this.processos foram executados!')
+          console.log('=====================================')
           console.log(this.processos)
+          this.tempoMediaEspera =
+            this.processos.reduce((acc, processo) => acc + processo.tempoTurnaround, 0) /
+            this.processos.length
+
+          this.tempoTotalProcessador = backup.reduce((acc, processo) => acc + processo.tempo, 0)
+
+          this.tempoMedioRetorno =
+            this.processos.reduce((acc, processo) => acc + processo.tempoTurnaround, 0) /
+            this.processos.length
+
+          return
         }
-      }
+
+        // Encontre o processo atual pelo ID
+        const processo =
+          filtrado.find((processo) => processo.id === this.currentIndex) || filtrado[0]
+
+        processo.status = 'Executando'
+
+        // Atualize o tempo de turnaround do processo atual
+        processo.tempoTurnaround += Math.min(processo.tempo, this.quantum)
+
+        // Decresça o tempo restante do processo atual
+        processo.tempo -= Math.min(processo.tempo, this.quantum)
+
+        // Atualize o tempo de espera de outros this.processos
+        this.processos.forEach((outroProcesso) => {
+          if (outroProcesso.status !== 'Concluído' && outroProcesso.id !== this.currentIndex) {
+            const tempo = Math.min(outroProcesso.tempo, this.quantum)
+            outroProcesso.tempoEspera += tempo
+            outroProcesso.tempoTurnaround += tempo
+          }
+        })
+
+        // Atualize o status do processo após o processamento
+        processo.status = processo.tempo === 0 ? 'Concluído' : 'Pronto'
+        this.processos[processo.id - 1] = processo
+
+        // Atualize a lista de this.processos a serem filtrados
+        filtrado = this.processos.filter((processo) => processo.status !== 'Concluído')
+        this.currentIndex =
+          filtrado.filter((processo) => processo.id > this.currentIndex)[0]?.id || 1
+      }, 1000)
     }
   }
 })
