@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4 border-r-2">
+  <div class="flex flex-col gap-4 md:border-r-2">
     <h2 class="font-bold text-xl text-blue-950 dark:text-white">Variáveis de Ambiente</h2>
     <FormKit
       type="form"
@@ -17,7 +17,7 @@
         min="0"
         validation="min:1|required"
         label="Quantum"
-        input-class="bg-slate-200 dark:bg-slate-700 rounded shadow-sm p-2"
+        input-class="bg-slate-200 dark:bg-slate-700 rounded shadow-sm p-2 w-full md:w-11/12"
         :value="store.quantum"
       />
     </FormKit>

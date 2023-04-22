@@ -23,6 +23,7 @@
             <th class="p-2">Ordem</th>
             <th class="p-2">Nome</th>
             <th class="p-2">Status</th>
+            <th class="p-2">Tempo base</th>
             <th class="p-2">Tempo restante</th>
             <th class="p-2">Tempo de espera</th>
             <th class="p-2">Tempo de turnaround</th>
@@ -59,19 +60,20 @@
                 </span>
               </div>
             </td>
+            <td class="p-2">{{ process.tempoBase }}</td>
             <td class="p-2">{{ process.tempo }}</td>
             <td class="p-2">{{ process.tempoEspera || 0 }}</td>
             <td class="p-2">{{ process.tempoTurnaround || 0 }}</td>
           </tr>
           <tr class="bg-slate-300 dark:bg-slate-950 p-2 text-center font-bold">
-            <td colspan="2" class="p-2">Tempo Médio de espera</td>
-            <td colspan="2" class="p-2">Tempo Médio de retorno</td>
-            <td colspan="2" class="p-2">Tempo de processador</td>
+            <td colspan="3" class="p-2">Tempo Médio de espera</td>
+            <td colspan="3" class="p-2">Tempo Médio de retorno</td>
+            <td colspan="3" class="p-2">Tempo de processador</td>
           </tr>
           <tr>
-            <td colspan="2" class="text-center p-2">{{ store.tempoMediaEspera }}</td>
-            <td colspan="2" class="text-center p-2">{{ store.tempoMedioRetorno }}</td>
-            <td colspan="2" class="text-center p-2">{{ store.tempoTotalProcessador }}</td>
+            <td colspan="3" class="text-center p-2">{{ store.tempoMediaEspera }}</td>
+            <td colspan="3" class="text-center p-2">{{ store.tempoMedioRetorno }}</td>
+            <td colspan="3" class="text-center p-2">{{ store.tempoTotalProcessador }}</td>
           </tr>
         </tbody>
       </table>
