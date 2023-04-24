@@ -44,7 +44,7 @@ const toastStore = useToastStore()
 
 function submitForm({nome, tempo}) {
   reset('process-form')
-  store.addProcess({nome, tempo: Number(tempo)})
+  store.addProcess({nome, tempo: Number(tempo), tempoBase: Number(tempo)})
   toastStore.setToast('Processo adicionado com sucesso!')
 }
 </script>

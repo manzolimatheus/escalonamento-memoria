@@ -72,6 +72,7 @@ export const useProcessStore = defineStore('process', () => {
       this.currentIndex = 1
     },
     init() {
+      console.log(this.processos)
       let filtrado = this.processos.filter((processo) => processo.status !== 'Concluído')
 
       const interval = setInterval(() => {
@@ -84,7 +85,10 @@ export const useProcessStore = defineStore('process', () => {
             this.processos.reduce((acc, processo) => acc + processo.tempoEspera, 0) /
             this.processos.length
 
-          this.tempoTotalProcessador = this.processos.reduce((acc, processo) => acc + processo.tempoBase, 0)
+          this.tempoTotalProcessador = this.processos.reduce(
+            (acc, processo) => acc + processo.tempoBase,
+            0
+          )
 
           this.tempoMedioRetorno =
             this.processos.reduce((acc, processo) => acc + processo.tempoTurnaround, 0) /
@@ -100,7 +104,42 @@ export const useProcessStore = defineStore('process', () => {
         processo.status = 'Executando'
 
         // Atualize o tempo de turnaround do processo atual
-        processo.tempoTurnaround += Math.min(processo.tempo, this.quantum)
+        // processo.tempoTurnaround = Math.min(processo.tempo, this.quantum)
+        if (this.quantum > processo.tempo) {
+          try {
+            processo.tempoTurnaround =
+              Number(this.processos[processo.id - 2].tempoTurnaround) + Number(processo.tempoBase)
+          } catch {
+            if (this.processos[this.processos.length - 1].tempoTurnaround === 0) {
+              processo.tempoTurnaround = Number(processo.tempo)
+            } else {
+              processo.tempoTurnaround =
+                Number(this.processos[this.processos.length - 1].tempoTurnaround) +
+                Number(processo.tempo)
+            }
+          }
+        } else {
+          try {
+            processo.tempoTurnaround =
+              Number(this.processos[processo.id - 2].tempoTurnaround) + Number(this.quantum)
+          } catch {
+            if (this.processos[this.processos.length - 1].tempoTurnaround === 0) {
+              processo.tempoTurnaround = Number(this.quantum)
+            } else if (
+              this.processos[this.processos.length - 1].tempoTurnaround > 0 &&
+              this.processos[this.processos.length - 1].status !== 'Concluído'
+            ) {
+              processo.tempoTurnaround =
+                Number(this.processos[this.processos.length - 1].tempoTurnaround) +
+                Number(this.quantum)
+            } else {
+              const maxTempo = this.processos.reduce(function (prev, current) {
+                return prev.tempoTurnaround > current.tempoTurnaround ? prev : current
+              })
+              processo.tempoTurnaround = Number(maxTempo.tempoTurnaround) + Number(this.quantum)
+            }
+          }
+        }
 
         // Decresça o tempo restante do processo atual
         processo.tempo -= Math.min(processo.tempo, this.quantum)
@@ -108,9 +147,33 @@ export const useProcessStore = defineStore('process', () => {
         // Atualize o tempo de espera de outros this.processos
         this.processos.forEach((outroProcesso) => {
           if (outroProcesso.status === 'Pronto' && outroProcesso.id !== this.currentIndex) {
-            const tempo = Math.min(outroProcesso.tempo, this.quantum)
-            outroProcesso.tempoEspera += tempo
-            outroProcesso.tempoTurnaround += tempo
+            const tempo = Number(Math.min(outroProcesso.tempo, this.quantum))
+            if (this.quantum > outroProcesso.tempo) {
+              try {
+                if (outroProcesso.id === 3) {
+                  console.log('entrou try uhuuuuu')
+                }
+                outroProcesso.tempoEspera =
+                  Number(this.processos[outroProcesso.id - 2].tempoEspera) +
+                  Number(this.processos[outroProcesso.id - 2].tempoBase)
+              } catch (error) {
+                console.log('entrou catch')
+                if (this.processos[this.processos.length - 1].tempoEspera === 0) {
+                  outroProcesso.tempoEspera += Number(tempo) //aaaa
+                } else {
+                  outroProcesso.tempoEspera +=
+                    Number(this.processos[this.processos.length - 1].tempoEspera) + Number(tempo)
+                }
+              }
+            } else {
+              // ============================ AQUI ============================
+              // ============================ AQUI ============================
+              // ============================ AQUI ============================
+              // ============================ AQUI ============================
+
+              outroProcesso.tempoEspera += tempo
+              console.log(outroProcesso.tempoEspera)
+            }
           }
         })
 
