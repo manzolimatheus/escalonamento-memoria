@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { rr } from '@/helpers/rr.js'
+import { executeRoundRobin } from '@/helpers/rr.js'
 
 export const useProcessStore = defineStore('process', () => {
   return {
@@ -41,12 +41,10 @@ export const useProcessStore = defineStore('process', () => {
     tempoMediaEspera: 0,
     tempoMedioRetorno: 0,
     tempoTotalProcessador: 0,
-    currentIndex: 1,
     setQuantum(quantum) {
       this.quantum = quantum
     },
     addProcess(process) {
-      console.log(process)
       process.id = this.processos.length + 1
       process.status = 'Pronto'
       process.tempoTurnaround = 0
@@ -67,29 +65,32 @@ export const useProcessStore = defineStore('process', () => {
       this.tempoMediaEspera = 0
       this.tempoTotalProcessador = 0
       this.tempoMedioRetorno = 0
-      this.currentIndex = 1
     },
     init() {
-      const initialTimes = this.processos.map((p) => 0)
-      const burstTimes = this.processos.map((p) => p.tempo)
+      const listaTempoExecucao = this.processos.map((p) => p.tempo)
 
-      const result = rr(initialTimes, burstTimes, this.quantum).solvedProcessesInfo.map((item) => {
+      const result = executeRoundRobin(listaTempoExecucao, this.quantum).processos.map((item) => {
         return {
-          nome: item.job,
-          tempo: item.bt,
-          tempoEspera: item.wat,
-          tempoTurnaround: item.tat,
+          id: item.id,
+          nome: item.nome,
+          tempo: item.tempoExecucao,
+          tempoEspera: item.tempoEspera,
+          tempoTurnaround: item.tempoTurnaround,
           status: 'Concluído'
         }
       })
 
       this.processos = result
 
-      this.tempoMediaEspera =
+      this.tempoMediaEspera = (
         this.processos.reduce((acc, curr) => acc + curr.tempoEspera, 0) / this.processos.length
-      this.tempoMedioRetorno =
+      ).toFixed(2)
+      this.tempoMedioRetorno = (
         this.processos.reduce((acc, curr) => acc + curr.tempoTurnaround, 0) / this.processos.length
-      this.tempoTotalProcessador = this.processos.reduce((acc, curr) => acc + curr.tempo, 0)
+      ).toFixed(2)
+      this.tempoTotalProcessador = this.processos
+        .reduce((acc, curr) => acc + curr.tempo, 0)
+        .toFixed(2)
     }
   }
 })
