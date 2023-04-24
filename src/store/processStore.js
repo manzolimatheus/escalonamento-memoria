@@ -72,7 +72,7 @@ export const useProcessStore = defineStore('process', () => {
       const result = executeRoundRobin(listaTempoExecucao, this.quantum).processos.map((item) => {
         return {
           id: item.id,
-          nome: item.nome,
+          nome: this.processos.filter(p => p.id === item.id)[0].nome,
           tempo: item.tempoExecucao,
           tempoEspera: item.tempoEspera,
           tempoTurnaround: item.tempoTurnaround,
