@@ -4,7 +4,7 @@
     <FormKit
       id="process-form"
       type="form"
-      submit-label="Adicionar Processo"
+      submit-label="Salvar"
       input-class="text-red"
       @submit="submitForm"
       :submit-attrs="{
@@ -12,29 +12,30 @@
       }"
     >
       <FormKit
-        type="text"
-        name="nome"
-        id="nome"
-        placeholder="Abrir Bloco de Notas"
+        type="number"
+        name="qtdBlocos"
+        id="qtdBlocos"
+        placeholder="4"
         validation="required"
-        label="Nome do Processo"
+        label="Quantidade de Páginas"
         input-class="bg-slate-200 dark:bg-slate-700 rounded shadow-sm p-2 w-full"
+        :value="store.qtdBlocos"
       />
       <FormKit
-        type="number"
-        name="tempo"
-        id="tempo"
+        type="text"
+        name="processos"
+        id="processos"
         placeholder="10"
-        validation="min:1|required"
-        label="Tempo do Processo"
+        validation="required"
+        label="Processos (Separados por espaço)"
         input-class="bg-slate-200 dark:bg-slate-700 rounded shadow-sm p-2 w-full"
+        :value="store.processos.join(' ')"
       />
     </FormKit>
   </div>
 </template>
 
 <script setup>
-import { reset } from '@formkit/vue';
 import { useProcessStore } from '@/store/processStore'
 
 const store = useProcessStore()
@@ -42,9 +43,8 @@ const store = useProcessStore()
 import { useToastStore } from '@/store/toastStore'
 const toastStore = useToastStore()
 
-function submitForm({nome, tempo}) {
-  reset('process-form')
-  store.addProcess({nome, tempo: Number(tempo), tempoBase: Number(tempo)})
+function submitForm({ qtdBlocos, processos }) {
+  store.saveConfig(qtdBlocos, processos)
   toastStore.setToast('Processo adicionado com sucesso!')
 }
 </script>

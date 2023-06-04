@@ -3,7 +3,7 @@
     <section class="flex gap-4 flex-wrap">
       <button
         class="dark:text-white bg-transparent border-green-500 border-2 rounded px-2 py-1 text-2xl font-bold hover:bg-green-500 flex gap-4 items-center"
-        @click="store.init"
+        @click="store.runFIFO"
       >
         <ion-icon name="play-circle-outline"></ion-icon>
         <span>Executar</span>
@@ -25,14 +25,9 @@
           </h1>
         </template>
         <template v-slot:content>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <section class="flex flex-col gap-4 md:col-span-1">
-              <QuantumForm />
-            </section>
+          <div class="gap-4">
             <!-- Processos -->
-            <section class="flex flex-col gap-4 md:col-span-2">
-              <ProcessForm />
-            </section>
+            <ProcessForm />
           </div>
         </template>
       </AccordionContainer>
@@ -55,7 +50,6 @@
 </template>
 
 <script setup>
-import QuantumForm from '@/components/Forms/QuantumForm.vue'
 import ProcessForm from '@/components/Forms/ProcessForm.vue'
 import AccordionContainer from '@/components/AccordionContainer.vue'
 import ProcessesTable from '@/components/ProcessesTable.vue'

@@ -5,7 +5,7 @@
       <div class="bg-white dark:bg-slate-800 rounded shadow-sm p-4 flex flex-col gap-4">
         <h3>3º SEMESTRE ADS NOTURNO</h3>
         <hr />
-        <a href="https://github.com/" target="_blank">
+        <a href="https://github.com/manzolimatheus/escalonamento-memoria" target="_blank">
           <ion-icon name="logo-github"></ion-icon> <span>Repositório do projeto</span></a
         >
       </div>
@@ -20,10 +20,7 @@
       <blockquote>
         <q>
           Utilizar qualquer linguagem de programação e/ou ambiente para desenvolvimento. Utilizar
-          conceitos de vetor, registro e/ou matrize funções. Não fixar nenhum valor para as
-          variáveis. Apresentar a evolução do algoritmo e tempo médio de espera, tempo de
-          turnaround, tempo de espera de cada processo, tempo de retorno etempo total de
-          processador.
+          conceitos de vetor, registro e/ou matrize funções.
         </q>
       </blockquote>
       <section>
